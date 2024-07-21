@@ -1,0 +1,171 @@
+{% extends 'chat/base.html' %}
+
+{% block content %}
+<script>
+  .bscb{
+    box-sizing : content-box;
+    display : flex;
+  }
+  .uname{
+    
+    background-color:red;
+  }
+  
+</script>
+<div class="container">
+      
+<h2 class="badge text-bg-dark" style="position:sticky;top:60px;width:100%;font-size:2rem;">{{friend.profile.name}}</h2>
+    <div id="chat-body" class="container" style="position:inherit ; top:500px;background-color : silver;display : flex; flex-direction:column;min-height:570px;border-radius:30px;padding-top:30px;">
+        
+
+          {% for chat in chats %}
+
+          {% if chat.msg_sender == profile and chat.msg_reciever == user %}
+            <div class="d-flex flex-row mb-3 bscb" style="">
+              <span class="badge text-bg-primary" ><p class="h5">{{chat}}</p></span>
+            </div>
+          {% elif chat.msg_sender == user and chat.msg_reciever == profile%}
+            <div class="d-flex flex-row-reverse mb-3 bscb">
+              <span class="badge text-bg-success"><p class="h5">{{chat}}</p></span>
+            </div> 
+          {% endif %}
+          {% endfor %}
+
+            
+          
+        
+           
+        
+    </div>
+    <form method="POST" id="myform">
+        <div class="mb-3 d-flex">
+          {% comment %} <input type="text" class="form-control" id="exampleInputEmail1" style="width:1000px;" > {% endcomment %}
+          {% csrf_token %}
+          {{form.body}}
+        
+        <button type="submit" class="btn btn-primary">Submit</button>
+      </div>
+    </form>
+</div>
+
+<script>
+  window.scrollTo(0, document.body.scrollHeight);
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+  }
+  const csrftoken = getCookie('csrftoken');
+
+  let form=document.getElementById("myform");
+  form.addEventListener("submit" , sendChat);
+  
+  function sendChat(e){
+    
+    e.preventDefault()
+    let chatMessage= document.getElementById("iid3").value
+    console.log(chatMessage)
+
+    const data = { msg: chatMessage };
+    let url= "{% url 'sent_msg' pk=friend.profile.id %}"
+  
+  fetch(url, {
+    method: 'POST', // or 'PUT'
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRFToken': csrftoken,
+    },
+    body: JSON.stringify(data),
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      console.log('Success:', data);
+      let chat_body= document.getElementById("chat-body")
+      let chatMessageBox=document.createElement("div")
+      chatMessageBox.classList.add("d-flex")
+      chatMessageBox.classList.add("bscb")
+      chatMessageBox.classList.add("flex-row-reverse")
+      chatMessageBox.classList.add("mb-3")
+      //<span class="badge text-bg-success"><p class="h5">{{chat}}</p></span>
+      let sent_chat=document.createElement("span")
+      sent_chat.classList.add("badge")
+      sent_chat.classList.add("text-bg-success")
+      let tempvar=document.createElement("p")
+      tempvar.classList.add("h5")
+      tempvar.innerText=data
+      sent_chat.append(tempvar)
+      chatMessageBox.append(sent_chat)
+      chat_body.append(chatMessageBox)
+
+      document.getElementById("iid3").value=""
+      window.scrollTo(0, document.body.scrollHeight);
+    })
+    .catch((error) => {
+      console.error('Error:', error);
+    });
+    
+  }
+  
+  setInterval( recieveMessages , 3000);
+
+  let counter={{num}}
+  function recieveMessages(){
+
+    
+    let url= "{% url 'rec_msg' pk=friend.profile.id %}"
+  
+  fetch(url)
+    .then((response) => response.json())
+    .then((data) => {
+      console.log('Success:', data);
+
+      if (data.length == 0){}
+
+      else{
+        let lastMsg = data[data.length-1]
+        if (counter==data.length){console.log("There are no new messages")}
+        else{
+          let chat_body= document.getElementById("chat-body")
+          let chatMessageBox=document.createElement("div")
+          chatMessageBox.classList.add("d-flex")
+          chatMessageBox.classList.add("bscb")
+          chatMessageBox.classList.add("flex-row")
+          chatMessageBox.classList.add("mb-3")
+          //<span class="badge text-bg-success"><p class="h5">{{chat}}</p></span>
+          let sent_chat=document.createElement("span")
+          sent_chat.classList.add("badge")
+          sent_chat.classList.add("text-bg-primary")
+          let tempvar=document.createElement("p")
+          tempvar.classList.add("h5")
+          tempvar.innerText=lastMsg
+          sent_chat.append(tempvar)
+          chatMessageBox.append(sent_chat)
+          chat_body.append(chatMessageBox)
+          document.getElementById("iid3").value="" 
+        }
+      }
+
+      counter=data.length
+    })
+    .catch((error) => {
+      console.error('Error:', error);
+    });
+  }
+
+  
+
+
+
+</script>
+
+{% endblock content %}

@@ -1,0 +1,192 @@
+{% extends 'chat/base.html' %}
+
+{% block content %}
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="author" content="Yinka Enoch Adedokun">
+	<meta name="description" content="Simple Forgot Password Page Using HTML and CSS">
+	<meta name="keywords" content="forgot password page, basic html and css">
+	<title>Forgot Password Page - HTML + CSS</title>
+</head>
+
+<style>
+  * {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "segoe ui", verdana, helvetica, arial, sans-serif;
+  font-size: 16px;
+  transition: all 500ms ease; }
+
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  -moz-font-feature-settings: "liga" on;
+  background-color:#2c2c2c;
+}
+
+.row {
+  background-color: #2c2c2c;
+  color: #cbb300;
+  text-align: center;
+  padding: 2em 2em 0.5em;
+  border:2px solid;
+  width: 90%;
+  margin: 2em	auto;
+  border-radius: 5px; }
+  .row h1 {
+    font-size: 2.5em; }
+  .row .form-group {
+    margin: 0.5em 0; }
+    .row .form-group label {
+      display: block;
+      color: #cbb300;
+      text-align: left;
+      font-weight: 600; }
+    .row .form-group input, .row .form-group a {
+      display: block;
+      padding: 0.5em 0;
+      width: 100%;
+      margin-top: 1em;
+      margin-bottom: 0.5em;
+      background-color: inherit;
+      border: none;
+      border-bottom: 1px solid #555;
+      color: #eee; }
+      .row .form-group input:focus, .row .form-group a:focus {
+        background-color: #cbb300;
+        color: #000;
+        border: none;
+        padding: 1em 0.5em; animation: pulse 1s infinite ease;}
+    .row .form-group a {
+      border: 1px solid #cbb300;
+      text-decoration:none;
+      border-radius: 5px;
+      outline: none;
+      -moz-user-select: none;
+      user-select: none;
+      color: #fff;
+      font-weight: 800;
+      cursor: pointer;
+      margin-top: 2em;
+      padding: 1em; }
+      .row .form-group a:hover, .row .form-group a:focus {
+        background-color: #cbb300; }
+      
+  .row .footer h5 {
+    margin-top: 1em; }
+  .row .footer p {
+    margin-top: 2em; }
+    .row .footer p .symbols {
+      color: #444; }
+  .row .footer a {
+    color: inherit;
+    text-decoration: none; }
+
+.information-text {
+  color: #ddd; }
+
+@media screen and (max-width: 320px) {
+  .row {
+    padding-left: 1em;
+    padding-right: 1em; }
+    .row h1 {
+      font-size: 1.5em !important; } }
+@media screen and (min-width: 900px) {
+  .row {
+    width: 50%; } }
+
+</style>
+<body>
+    <form method="POST">
+        {% csrf_token %}
+	<div class="row">
+		<h1>Forgot Password</h1>
+		<h6 class="information-text">Enter your registered email to reset your password.</h6>
+		<div class="form-group">
+            <div id="fg">
+			<input type="email" name="user_email" id="user_email">
+			<p><label id='lbl' for="username">Email</label></p>
+            </div>
+			<button id='reset_btn' >Reset Password</button>
+		</div>
+		<div class="footer">
+			<h5>New here? <a href="///127.0.0.1:8000/{% url '/login' %}">Sign Up.</a></h5>
+			<h5>Already have an account? <a href="///127.0.0.1:8000/{% url '/login' %}">Sign In.</a></h5>
+			
+		</div>
+	</div>
+</body>
+<script>
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+  }
+  const csrftoken = getCookie('csrftoken');
+
+
+    let reset_btn=document.getElementById('reset_btn')
+    let fg=document.getElementById('fg')
+    let lbl=document.getElementById('lbl')
+    reset_btn.onclick = function(e){
+        e.preventDefault()
+        let em=document.getElementById("user_email").value
+        let ott=document.createElement("input")
+        let lbl2=document.createElement("label")
+        ott.id = 'ootp'
+        lbl2.innerText="Enter OTP"
+        console.log(em)
+         
+
+        fg.append(ott)
+        fg.append(lbl2)
+        const data = { em: em };
+    let url= "{% url 'ver_em' %}"
+  
+  fetch(url, {
+    method: 'POST', // or 'PUT'
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRFToken': csrftoken,
+    },
+    body: JSON.stringify(data),
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      console.log('Success:', data);
+      let new_btn=document.createElement("button")
+      new_btn.innerText="Verify OTP"
+      fg.append(new_btn)
+      reset_btn.style.display="none"
+      new_btn.onclick= function(e){
+        e.preventDefault()
+        let ootp=document.getElementById("ootp").value
+        if(ootp == data){
+            window.location.replace("reset");
+        }
+      }
+      
+
+    })
+    .catch((error) => {
+      console.error('Error:', error);
+    });
+    
+    };
+
+</script>
+
+{% endblock content %}

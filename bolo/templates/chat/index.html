@@ -1,0 +1,29 @@
+{% extends 'chat/base.html' %}
+
+{% block content %}
+<style>
+  body{
+    background-color : #2c2c2c;
+    color:#cbb300;
+  }
+  .btn-primary{
+    background-color:#cbb300;
+    border : 1px solid white;
+  }
+</style>
+<div class="container">
+    <form method="POST" action="checkroom">
+        {% csrf_token %}
+        <div class="mb-3">
+          <label for="exampleInputEmail1" class="form-label">Room Name</label>
+          <input type="text" class="form-control" id="exampleInputEmail1" name="room_name">
+          {% comment %} <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div> {% endcomment %}
+        </div>
+        <div class="mb-3">
+          <label for="exampleInputPassword1" class="form-label">Your Name</label>
+          <input type="text" class="form-control" name="user_name" id="exampleInputPassword1">
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+      </form>
+</div>
+{% endblock content %}

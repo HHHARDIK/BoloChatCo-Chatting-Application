@@ -1,0 +1,336 @@
+{% extends 'chat/base.html' %}
+{% block content %}
+
+<style>
+
+    @import url('https://fonts.googleapis.com/css?family=Poppins:400,500,600,700&display=swap');
+    *{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+    }
+    html,body{
+    display: grid;
+    height: 100%;
+    width: 100%;
+    place-items: center;
+    background: -webkit-linear-gradient(left, #2e2e2e,#000000,#272727
+    , #434343);
+    }
+    ::selection{
+    background: #d5be0f;
+    color: #fff;
+    }
+    .wrapper{
+    overflow: hidden;
+    max-width: 390px;
+    background: #fff;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0px 15px 20px rgba(0,0,0,0.1);
+    }
+    .wrapper .title-text{
+    display: flex;
+    width: 200%;
+    }
+    .wrapper .title{
+    width: 50%;
+    font-size: 35px;
+    font-weight: 600;
+    text-align: center;
+    transition: all 0.6s cubic-bezier(0.68,-0.55,0.265,1.55);
+    }
+    .wrapper .slide-controls{
+    position: relative;
+    display: flex;
+    height: 50px;
+    width: 100%;
+    overflow: hidden;
+    margin: 30px 0 10px 0;
+    justify-content: space-between;
+    border: 1px solid lightgrey;
+    border-radius: 15px;
+    }
+    .slide-controls .slide{
+    height: 100%;
+    width: 100%;
+    color: rgb(30, 28, 18);
+    font-size: 18px;
+    font-weight: 500;
+    text-align: center;
+    line-height: 48px;
+    cursor: pointer;
+    z-index: 1;
+    transition: all 0.6s ease;
+    }
+    .slide-controls label.signup{
+    color: #000;
+    }
+    .slide-controls .slider-tab{
+    position: absolute;
+    height: 100%;
+    width: 50%;
+    left: 0;
+    z-index: 0;
+    border-radius: 15px;
+    background: -webkit-linear-gradient(left,#dac207,#d9c000,#fff186
+    , #fff7bc);
+    transition: all 0.6s cubic-bezier(0.68,-0.55,0.265,1.55);
+    }
+    input[type="radio"]{
+    display: none;
+    }
+    #signup:checked ~ .slider-tab{
+    left: 50%;
+    }
+    #signup:checked ~ label.signup{
+    color: rgb(30, 28, 18);
+    cursor: default;
+    user-select: none;
+    }
+    #signup:checked ~ label.login{
+    color: #000;
+    }
+    #login:checked ~ label.signup{
+    color: #000;
+    }
+    #login:checked ~ label.login{
+    cursor: default;
+    user-select: none;
+    }
+    .wrapper .form-container{
+    width: 100%;
+    overflow: hidden;
+    }
+    .form-container .form-inner{
+    display: flex;
+    width: 200%;
+    }
+    .form-container .form-inner form{
+    width: 50%;
+    transition: all 0.6s cubic-bezier(0.68,-0.55,0.265,1.55);
+    }
+    .form-inner form .field{
+    height: 50px;
+    width: 100%;
+    margin-top: 20px;
+    }
+    .form-inner form .field input{
+    height: 100%;
+    width: 100%;
+    outline: none;
+    padding-left: 15px;
+    border-radius: 15px;
+    border: 1px solid lightgrey;
+    border-bottom-width: 2px;
+    font-size: 17px;
+    transition: all 0.3s ease;
+    }
+    .form-inner form .field input:focus{
+    border-color: #d5be0f;
+    /* box-shadow: inset 0 0 3px #fb6aae; */
+    }
+    .form-inner form .field input::placeholder{
+    color: #999;
+    transition: all 0.3s ease;
+    }
+    form .field input:focus::placeholder{
+    color: #d5be0f;
+    }
+    .form-inner form .pass-link{
+    margin-top: 5px;
+    }
+    .form-inner form .signup-link{
+    text-align: center;
+    margin-top: 30px;
+    }
+    .form-inner form .pass-link a,
+    .form-inner form .signup-link a{
+    color: #d5be0f;
+    text-decoration: none;
+    }
+    .form-inner form .pass-link a:hover,
+    .form-inner form .signup-link a:hover{
+    text-decoration: underline;
+    }
+    form .btn{
+    height: 50px;
+    width: 100%;
+    border-radius: 15px;
+    position: relative;
+    overflow: hidden;
+    }
+    form .btn .btn-layer{
+    height: 100%;
+    width: 300%;
+    position: absolute;
+    left: -100%;
+    background: -webkit-linear-gradient(right,#f8e342,#ffe93f,#fff7bb
+    , #d5be0f);
+    border-radius: 15px;
+    transition: all 0.4s ease;;
+    }
+    form .btn:hover .btn-layer{
+    left: 0;
+    }
+    form .btn input[type="submit"]{
+    height: 100%;
+    width: 100%;
+    z-index: 1;
+    position: relative;
+    background: none;
+    border: none;
+    color: rgb(0, 0, 0);
+    padding-left: 0;
+    border-radius: 15px;
+    font-size: 20px;
+    font-weight: 500;
+    cursor: pointer;
+    }
+  .error{
+    color:red;
+  }
+
+</style>
+
+<div class="wrapper">
+    <div class="title-text">
+      <div class="title login">Login Form</div>
+      <div class="title signup">Signup Form</div>
+    </div>
+    <div class="form-container">
+      <div class="slide-controls">
+        <input type="radio" name="slide" id="login" checked>
+        <input type="radio" name="slide" id="signup">
+        <label for="login" class="slide login">Login</label>
+        <label for="signup" class="slide signup">Signup</label>
+        <div class="slider-tab"></div>
+      </div>
+      <div class="form-inner">
+        <form action="" method="POST" class="login" id="loginform">
+          {% csrf_token %}
+          <div class="field">
+            <input type="text" placeholder="Email Address" id="logeMail" name="logeMail" required>
+          </div>
+          <div class="field">
+            <input type="password" placeholder="Password" id="logpassword" name="logpassword" required>
+          </div>
+          <div class="pass-link"><a href="///127.0.0.1:8000/{% url '/forgot' %}">Forgot password?</a></div>
+          <div class="field btn">
+            <div class="btn-layer"></div>
+            <input type="submit" value="Login">
+          </div>
+          <div class="signup-link">Not a member? <a href="">Signup now</a></div>
+        </form>
+        <form action="" class="signup" id="signupform">
+          {% csrf_token %}
+          <div class="field">
+            <input type="text" placeholder="User Name" id="userName" name="userName" required>
+          </div>
+          <p id="nameerr" class="error"></p>
+          <div class="field">
+            <input type="text" placeholder="Email Address" id="eMail" name="eMail" required>
+          </div>
+          <div class="field">
+            <input type="password" placeholder="Password" id="password1" name="password1" required>
+          </div>
+          <div class="field">
+            <input type="password" placeholder="Confirm password" id="password2" name="password2" required>
+          </div>
+          <p id="passerr" class="error"></p>
+
+          <div class="field btn">
+            <div class="btn-layer"></div>
+            <input type="submit" value="Signup">
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  const loginText = document.querySelector(".title-text .login");
+  const loginForm = document.querySelector("form.login");
+  const loginBtn = document.querySelector("label.login");
+  const signupBtn = document.querySelector("label.signup");
+  const signupLink = document.querySelector("form .signup-link a");
+  signupBtn.onclick = (()=>{
+    loginForm.style.marginLeft = "-50%";
+    loginText.style.marginLeft = "-50%";
+  });
+  loginBtn.onclick = (()=>{
+    loginForm.style.marginLeft = "0%";
+    loginText.style.marginLeft = "0%";
+  });
+  signupLink.onclick = (()=>{
+    signupBtn.click();
+    return false;
+  });
+
+
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+  }
+  const csrftoken = getCookie('csrftoken');
+
+  let form=document.getElementById("signupform");
+  let userName=document.getElementById("userName")
+  let eMail=document.getElementById("eMail")
+  let password1=document.getElementById("password1")
+  let password2=document.getElementById("password2")
+  form.addEventListener("submit" , signupform);
+  function signupform(e){
+
+    e.preventDefault()
+    const data={ userName : userName.value , eMail : eMail.value , password1 : password1.value , password2 : password2.value }
+    console.log(data)
+    let url= "{% url 'handle_signup' %}"
+    fetch(url, {
+      method: 'POST', // or 'PUT'
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': csrftoken,
+      },
+      body: JSON.stringify(data),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log('Success:', data);
+        if(data=="Name Error"){
+          document.getElementById("nameerr").innerText = "This Username already exists";
+        }
+        else if(data=="password Error"){
+          document.getElementById("passerr").innerText = "Passwords does not match";
+        }
+        else{
+          document.getElementById("login").checked = true;
+          loginForm.style.marginLeft = "0%";
+          loginText.style.marginLeft = "0%";
+          document.getElementById("userName").value=""
+          document.getElementById("eMail").value=""
+          document.getElementById("password1").value=""
+          document.getElementById("password2").value=""
+        }
+      })
+      .catch((error) => {
+        console.error('Error:', error);
+      });
+      
+    }
+  
+</script>
+
+{% endblock content %}
